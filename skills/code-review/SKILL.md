@@ -1,7 +1,7 @@
 ---
 name: code-review
 description: Code review a pull request using parallel subagents with validation to filter false positives. Use when asked to review a PR, review a diff, or "run code review". Pass --comment to post inline PR comments.
-allowed-tools: Bash(gh issue view:*), Bash(gh search:*), Bash(gh issue list:*), Bash(gh pr comment:*), Bash(gh pr diff:*), Bash(gh pr view:*), Bash(gh pr list:*), mcp__github_inline_comment__create_inline_comment
+allowed-tools: Bash(gh issue view:*), Bash(gh search:*), Bash(gh issue list:*), Bash(gh pr comment:*), Bash(gh pr diff:*), Bash(gh pr view:*), Bash(gh pr list:*), mcp__github_inline_comment__create_inline_comment, mcp__github__pull_request_read, mcp__github__add_issue_comment, mcp__github__pull_request_review_write, mcp__github__add_comment_to_pending_review, mcp__github__get_file_contents, mcp__github__issue_read
 ---
 
 # Code Review
@@ -76,7 +76,7 @@ Note: Still review Claude generated PR's.
 
 8. Create a list of all comments that you plan on leaving. This is only for you to make sure you are comfortable with the comments. Do not post this list anywhere.
 
-9. Post inline comments for each issue using `mcp__github_inline_comment__create_inline_comment` with `confirmed: true`. For each comment:
+9. Post inline comments for each issue using `mcp__github_inline_comment__create_inline_comment` with `confirmed: true`. If that tool is unavailable (cloud sessions), create a pending review with `mcp__github__pull_request_review_write` (method `create`), add each comment via `mcp__github__add_comment_to_pending_review`, then submit with `submit_pending` (event `COMMENT`). For each comment:
    - Provide a brief description of the issue
    - For small, self-contained fixes, include a committable suggestion block
    - For larger fixes (6+ lines, structural changes, or changes spanning multiple locations), describe the issue and suggested fix without a suggestion block
@@ -95,7 +95,7 @@ Use this list when evaluating issues in Steps 4 and 5 (these are false positives
 
 Notes:
 
-- Use gh CLI to interact with GitHub (e.g., fetch pull requests, create comments). Do not use web fetch.
+- Use gh CLI to interact with GitHub (e.g., fetch pull requests, create comments), or the `mcp__github__*` equivalents when `gh` is unavailable. Do not use web fetch.
 - Create a todo list before starting.
 - You must cite and link each issue in inline comments (e.g., if referring to a CLAUDE.md, include a link to it).
 - If no issues are found and `--comment` argument is provided, post a comment with the following format:
